@@ -26,6 +26,7 @@ public class QuizActivity extends ActionBarActivity {
     };
 
     private int mCurrentIndex = 0;
+    private boolean mIsCheater;
 
     private void udateQuestion(){
         int question = mQuestionBank[mCurrentIndex].getQuestion();
@@ -37,10 +38,14 @@ public class QuizActivity extends ActionBarActivity {
 
         int messageResId;
 
-        if(userPressedTrue == answerIsTrue){
-            messageResId = R.string.correct_toast;
+        if(mIsCheater) {
+            messageResId = R.string.judgment_toast;
         } else {
-            messageResId = R.string.incorrect_toast;
+            if(userPressedTrue == answerIsTrue){
+                messageResId = R.string.correct_toast;
+            } else {
+                messageResId = R.string.incorrect_toast;
+            }
         }
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
     }
@@ -63,6 +68,15 @@ public class QuizActivity extends ActionBarActivity {
         super.onSaveInstanceState(saveInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         saveInstanceState.putInt(KEY_INDEX, mCurrentIndex);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent date) {
+        if(date == null) {
+            return;
+        } else {
+            mIsCheater = date.getBooleanExtra(CheatActivity.EXTRA_ANSWER_SHOWN, false);
+        }
     }
 
     @Override
@@ -128,6 +142,7 @@ public class QuizActivity extends ActionBarActivity {
 
     public void nextButtonOnClick(View v) {
         mCurrentIndex = (mCurrentIndex + 1) % mQuestionBank.length;
+        mIsCheater = false;
         udateQuestion();
     }
 
